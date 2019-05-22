@@ -1,5 +1,6 @@
 package app.m.listas;
 
+import android.app.Dialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.AdapterView;
@@ -20,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText editText;
     private TextView text;
     ArrayList<String> lista;
+    ArrayAdapter<String> arrayAdapter;
     String countryList[] = {"India", "China", "Australia", "Portugle", "America", "NewZeland"};
 
     @Override
@@ -29,11 +31,9 @@ public class MainActivity extends AppCompatActivity {
         button = (Button) findViewById(R.id.button);
         editText = (EditText) findViewById(R.id.editText);
         text = (TextView) findViewById(R.id.textView);
-        Editar = (Button) findViewById(R.id.btn_Editar);
-        Borrar = (Button) findViewById(R.id.btn_Borrar);
         simpleList = findViewById(R.id.simpleListView);
         lista = new ArrayList<String>(Arrays.asList(countryList));
-        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, R.layout.activity_listview, R.id.textView, lista);
+        arrayAdapter = new ArrayAdapter<String>(MainActivity.this, R.layout.activity_listview, R.id.textView, lista);
 
         simpleList.setAdapter(arrayAdapter);
         arrayAdapter.notifyDataSetChanged();
@@ -46,6 +46,39 @@ public class MainActivity extends AppCompatActivity {
                 arrayAdapter.notifyDataSetChanged();
             }
         });
+        simpleList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view,final int i, long l) {
+                Toast mensaje = Toast.makeText(getApplicationContext(), "posicion "+i, Toast.LENGTH_SHORT);
+                mensaje.show();
 
+                final Dialog dialog=new Dialog(MainActivity.this);
+                dialog.setTitle("Modificar");
+                dialog.setContentView(R.layout.activity_opcionesdelista);
+                final EditText editText=(EditText)dialog.findViewById(R.id.txtinput);
+                editText.setText(lista.get(i));
+                Button Editar=(Button)dialog.findViewById(R.id.btdone);
+                Button Eliminar = (Button) dialog.findViewById(R.id.btnEliminar);
+                Editar.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        lista.set(i,editText.getText().toString());
+                        arrayAdapter.notifyDataSetChanged();
+                        dialog.dismiss();
+                    }
+                });
+                Eliminar.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        lista.remove(editText.getText().toString());
+                        arrayAdapter.notifyDataSetChanged();
+                        dialog.dismiss();
+                    }
+                });
+                simpleList.setAdapter(arrayAdapter);
+                arrayAdapter.notifyDataSetChanged();
+                dialog.show();
+            }
+        });
     }
 }
